@@ -1,0 +1,12 @@
+NO;NOMOR_SURAT;YANG_MENANDATANGANI;YANG_MENANDATANGANI_KODE;KODE_SURAT;BULAN;BULAN_ROMAWI;TAHUN;PERIHAL;YANG_MEMINTA_NOMOR;STATUS;NOMOR_SURAT_LENGKAP;URL_DRAFT_SURAT;ID
+1;100;Rektor;Unpas.RI;ST;Desember;XII;2023;Surat Tugas update coba lagi;Akademik;Dibatalkan;100/Unpas.RI/ST/XII/2023;http://localhost:3000/dashboard;2023_ST_100
+2;101;Rektor;Unpas.R;ST;Desember;XII;2023;mau dipakai;Akademik;Dibatalkan;101/Unpas.R/ST/XII/2023;http://localhost:3000/dashboard;
+3;1;Wakil Rektor Bidang Belmawabud;Unpas.RI;SK;Desember;XII;2023;test frontend update;Akademik;Digunakan;1/Unpas.RI/SK/XII/2023;http://localhost:3000/dashboard;
+4;2;Rektor;Unpas.R;SK;Desember;XII;2023;test;Akademik;Dibatalkan;2/Unpas.R/SK/XII/2023;http://localhost:3000/dashboard;
+5;3;Rektor;Unpas.R;SK;Desember;XII;2023;test lagi;Akademik;Digunakan;3/Unpas.R/SK/XII/2023;http://localhost:3000/dashboard;
+6;1;Wakil Rektor Bidang Belmawabud;Unpas.RI;U;Desember;XII;2023;test;Akademik;Digunakan;1/Unpas.RI/U/XII/2023;http://localhost:3000/dashboard;
+7;2;Wakil Rektor Bidang Keuangan;Unpas.RII;U;Desember;XII;2023;test ;IT;Digunakan;2/Unpas.RII/U/XII/2023;http://localhost:3000/dashboard;
+8;3;Wakil Rektor Bidang Keuangan;Unpas.RII;U;Desember;XII;2023;undangan;Keuangan;Dibatalkan;3/Unpas.RII/U/XII/2023;http://localhost:3000/dashboard;
+9;1;Rektor;Unpas.R;C;Desember;XII;2023;test create;Kepegawaian;Digunakan;1/Unpas.R/C/XII/2023;http://localhost:3000/dashboard;
+10;102;Rektor;Unpas.R;ST;Desember;XII;2023;tes input;Akademik;Digunakan;102/Unpas.R/ST/XII/2023;http://localhost:3000/dashboard;
+11;1;Wakil Rektor Bidang Keuangan;Unpas.RII;B;Desember;XII;2023;contoh;IT;Digunakan;1/Unpas.RII/B/XII/2023;http://localhost:3000/dashboard;
