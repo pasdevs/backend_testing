@@ -4,14 +4,26 @@ const path = require('path');
 const fs = require('fs');
 const csv = require('csv-parser');
 const connection = require('./koneksi');
+const multer = require('multer');
 
 const app = express();
 const port = 3001;
 
-app.use(cors());
+app.use(cors());  
 app.use(express.json());
 
-const filePath = path.join(__dirname, 'data', 'datasuratcsv.csv');
+// Multer Configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage });
+
 
 app.get('/getKodeSurat', (req, res) => {
   try {
@@ -135,10 +147,100 @@ app.get('/getDataByCode/:kodeSurat', (req, res) => {
 });
 
 
-app.post('/addData', (req, res) => {
+// app.post('/addData', (req, res) => {
+//   try {
+//     const { ID, NOMOR_SURAT, YANG_MENANDATANGANI, YANG_MENANDATANGANI_KODE, KODE_SURAT, BULAN, BULAN_ROMAWI, TAHUN, PERIHAL, UNIT_KERJA, STATUS, NOMOR_SURAT_LENGKAP, URL_DRAFT_SURAT, TANGGAL_PENGAJUAN, YANG_MEMBUBUHKAN_TTD, AUTHOR, NOMOR_WA_AUTHOR, EMAIL_AUTHOR, KETERANGAN, SERAHKAN_DOKUMEN } = req.body;
+//     // Query untuk menambahkan data baru ke dalam tabel
+//     const query = `
+//       INSERT INTO tb_master_nomor_surat (
+//         ID,
+//         NOMOR_SURAT,
+//         YANG_MENANDATANGANI,
+//         YANG_MENANDATANGANI_KODE,
+//         KODE_SURAT,
+//         BULAN,
+//         BULAN_ROMAWI,
+//         TAHUN,
+//         PERIHAL,
+//         UNIT_KERJA,
+//         STATUS,
+//         NOMOR_SURAT_LENGKAP,
+//         URL_DRAFT_SURAT,
+//         TANGGAL_PENGAJUAN,
+//         YANG_MEMBUBUHKAN_TTD,
+//         AUTHOR,
+//         NOMOR_WA_AUTHOR,
+//         EMAIL_AUTHOR,
+//         KETERANGAN,
+//         SERAHKAN_DOKUMEN 
+//       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//     `;
+
+//     // Parameter untuk query
+//     const values = [
+//       ID,
+//       NOMOR_SURAT,
+//       YANG_MENANDATANGANI,
+//       YANG_MENANDATANGANI_KODE,
+//       KODE_SURAT,
+//       BULAN,
+//       BULAN_ROMAWI,
+//       TAHUN,
+//       PERIHAL,
+//       UNIT_KERJA,
+//       STATUS,
+//       NOMOR_SURAT_LENGKAP,
+//       URL_DRAFT_SURAT,
+//       TANGGAL_PENGAJUAN,
+//       YANG_MEMBUBUHKAN_TTD, 
+//       AUTHOR, 
+//       NOMOR_WA_AUTHOR, 
+//       EMAIL_AUTHOR, 
+//       KETERANGAN,
+//       SERAHKAN_DOKUMEN
+//     ];
+
+//     // Menjalankan query
+//     connection.query(query, values, (error, results) => {
+//       if (error) {
+//         console.error(error);
+//         res.status(500).json({ success: false, error: 'Gagal menambahkan data ke database' });
+//       } else {
+//         res.json({ success: true, message: 'Data berhasil ditambahkan' });
+//       }
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ success: false, error: 'Terjadi kesalahan' });
+//   }
+// });
+
+app.post('/addData', upload.single('file'), (req, res) => {
   try {
-    const { ID, NOMOR_SURAT, YANG_MENANDATANGANI, YANG_MENANDATANGANI_KODE, KODE_SURAT, BULAN, BULAN_ROMAWI, TAHUN, PERIHAL, UNIT_KERJA, STATUS, NOMOR_SURAT_LENGKAP, URL_DRAFT_SURAT } = req.body;
-    // Query untuk menambahkan data baru ke dalam tabel
+    const {
+      ID,
+      NOMOR_SURAT,
+      YANG_MENANDATANGANI,
+      YANG_MENANDATANGANI_KODE,
+      KODE_SURAT,
+      BULAN,
+      BULAN_ROMAWI,
+      TAHUN,
+      PERIHAL,
+      UNIT_KERJA,
+      STATUS,
+      NOMOR_SURAT_LENGKAP,
+      TANGGAL_PENGAJUAN,
+      YANG_MEMBUBUHKAN_TTD,
+      AUTHOR,
+      NOMOR_WA_AUTHOR,
+      EMAIL_AUTHOR,
+      KETERANGAN,
+      SERAHKAN_DOKUMEN
+    } = req.body;
+
+    const fileUrl = req.file ? req.file.path : null;
+
     const query = `
       INSERT INTO tb_master_nomor_surat (
         ID,
@@ -153,11 +255,17 @@ app.post('/addData', (req, res) => {
         UNIT_KERJA,
         STATUS,
         NOMOR_SURAT_LENGKAP,
-        URL_DRAFT_SURAT
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        URL_DRAFT_SURAT,
+        TANGGAL_PENGAJUAN,
+        YANG_MEMBUBUHKAN_TTD,
+        AUTHOR,
+        NOMOR_WA_AUTHOR,
+        EMAIL_AUTHOR,
+        KETERANGAN,
+        SERAHKAN_DOKUMEN 
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    // Parameter untuk query
     const values = [
       ID,
       NOMOR_SURAT,
@@ -171,10 +279,16 @@ app.post('/addData', (req, res) => {
       UNIT_KERJA,
       STATUS,
       NOMOR_SURAT_LENGKAP,
-      URL_DRAFT_SURAT
+      fileUrl,  // Ganti dengan fileUrl sebagai URL_DRAFT_SURAT
+      TANGGAL_PENGAJUAN,
+      YANG_MEMBUBUHKAN_TTD, 
+      AUTHOR, 
+      NOMOR_WA_AUTHOR, 
+      EMAIL_AUTHOR, 
+      KETERANGAN,
+      SERAHKAN_DOKUMEN
     ];
 
-    // Menjalankan query
     connection.query(query, values, (error, results) => {
       if (error) {
         console.error(error);
@@ -194,7 +308,7 @@ app.put('/updateData/:id', (req, res) => {
   const { id } = req.params;
 
   try {
-    const { NOMOR_SURAT, YANG_MENANDATANGANI, YANG_MENANDATANGANI_KODE, KODE_SURAT, BULAN, BULAN_ROMAWI, TAHUN, PERIHAL, UNIT_KERJA, STATUS, NOMOR_SURAT_LENGKAP, URL_DRAFT_SURAT } = req.body;
+    const { NOMOR_SURAT, YANG_MENANDATANGANI, YANG_MENANDATANGANI_KODE, KODE_SURAT, BULAN, BULAN_ROMAWI, TAHUN, PERIHAL, UNIT_KERJA, STATUS, NOMOR_SURAT_LENGKAP, URL_DRAFT_SURAT, TANGGAL_PENGAJUAN, YANG_MEMBUBUHKAN_TTD, AUTHOR, NOMOR_WA_AUTHOR, EMAIL_AUTHOR, KETERANGAN, SERAHKAN_DOKUMEN } = req.body;
     // Query untuk memperbarui data dalam tabel
     const query = `
       UPDATE tb_master_nomor_surat
@@ -210,7 +324,14 @@ app.put('/updateData/:id', (req, res) => {
         UNIT_KERJA = ?,
         STATUS = ?,
         NOMOR_SURAT_LENGKAP = ?,
-        URL_DRAFT_SURAT = ?
+        URL_DRAFT_SURAT = ?,
+        TANGGAL_PENGAJUAN = ?,
+        YANG_MEMBUBUHKAN_TTD = ?, 
+        AUTHOR = ?, 
+        NOMOR_WA_AUTHOR = ?, 
+        EMAIL_AUTHOR = ?, 
+        KETERANGAN = ?,
+        SERAHKAN_DOKUMEN = ?
       WHERE ID = ?
     `;
 
@@ -228,6 +349,13 @@ app.put('/updateData/:id', (req, res) => {
       STATUS,
       NOMOR_SURAT_LENGKAP,
       URL_DRAFT_SURAT,
+      TANGGAL_PENGAJUAN, 
+      YANG_MEMBUBUHKAN_TTD, 
+      AUTHOR, 
+      NOMOR_WA_AUTHOR, 
+      EMAIL_AUTHOR, 
+      KETERANGAN,
+      SERAHKAN_DOKUMEN,
       id
     ];
 
