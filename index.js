@@ -18,12 +18,36 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+    cb(null, file.originalname);
   },
 });
 
 const upload = multer({ storage });
 
+
+//get file pdf:
+app.get('/getPdf/:id', (req, res) => {
+  const { id } = req.params;
+
+  try {
+    connection.query('SELECT URL_DRAFT_SURAT FROM tb_master_nomor_surat WHERE ID = ?', [id], (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Gagal mengambil data dari database' });
+      } else {
+        if (results.length > 0) {
+          const pdfPath = path.join(__dirname, 'uploads', results[0].URL_DRAFT_SURAT);
+          res.sendFile(pdfPath);
+        } else {
+          res.status(404).json({ success: false, error: 'Data tidak ditemukan' });
+        }
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Terjadi kesalahan' });
+  }
+});
 
 app.get('/getKodeSurat', (req, res) => {
   try {
@@ -89,6 +113,28 @@ app.get('/getAllData', (req, res) => {
   }
 });
 
+// app.get('/getData/:id', (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     connection.query('SELECT * FROM tb_master_nomor_surat WHERE ID = ?', [id], (error, results) => {
+//       if (error) {
+//         console.error(error);
+//         res.status(500).json({ success: false, error: 'Gagal mengambil data dari database' });
+//       } else {
+//         if (results.length > 0) {
+//           res.json({ success: true, data: results[0] });
+//         } else {
+//           res.status(404).json({ success: false, error: 'Data tidak ditemukan' });
+//         }
+//       }
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ success: false, error: 'Terjadi kesalahan' });
+//   }
+// });
+
+//get data by id dengan file pdf:
 app.get('/getData/:id', (req, res) => {
   const { id } = req.params;
   try {
@@ -98,6 +144,10 @@ app.get('/getData/:id', (req, res) => {
         res.status(500).json({ success: false, error: 'Gagal mengambil data dari database' });
       } else {
         if (results.length > 0) {
+          // Tambahkan properti 'pdf' ke objek results[0]
+          results[0].PDF_URL = `http://localhost:3001/getPdf/${id}`; // Sesuaikan dengan endpoint yang digunakan untuk mengunduh PDF
+
+          // Kirim respons dengan objek yang sudah diperbarui
           res.json({ success: true, data: results[0] });
         } else {
           res.status(404).json({ success: false, error: 'Data tidak ditemukan' });
@@ -239,7 +289,7 @@ app.post('/addData', upload.single('file'), (req, res) => {
       SERAHKAN_DOKUMEN
     } = req.body;
 
-    const fileUrl = req.file ? req.file.path : null;
+    const fileUrl = req.file ? req.file.originalname : null;
 
     const query = `
       INSERT INTO tb_master_nomor_surat (
@@ -304,11 +354,12 @@ app.post('/addData', upload.single('file'), (req, res) => {
 });
 
 
-app.put('/updateData/:id', (req, res) => {
+app.put('/updateData/:id', upload.single('file'), (req, res) => {
   const { id } = req.params;
 
   try {
     const { NOMOR_SURAT, YANG_MENANDATANGANI, YANG_MENANDATANGANI_KODE, KODE_SURAT, BULAN, BULAN_ROMAWI, TAHUN, PERIHAL, UNIT_KERJA, STATUS, NOMOR_SURAT_LENGKAP, URL_DRAFT_SURAT, TANGGAL_PENGAJUAN, YANG_MEMBUBUHKAN_TTD, AUTHOR, NOMOR_WA_AUTHOR, EMAIL_AUTHOR, KETERANGAN, SERAHKAN_DOKUMEN } = req.body;
+    const fileUrl = req.file ? req.file.originalname : null;
     // Query untuk memperbarui data dalam tabel
     const query = `
       UPDATE tb_master_nomor_surat
@@ -348,7 +399,7 @@ app.put('/updateData/:id', (req, res) => {
       UNIT_KERJA,
       STATUS,
       NOMOR_SURAT_LENGKAP,
-      URL_DRAFT_SURAT,
+      fileUrl, // Ganti dengan fileUrl sebagai URL_DRAFT_SURAT  
       TANGGAL_PENGAJUAN, 
       YANG_MEMBUBUHKAN_TTD, 
       AUTHOR, 
