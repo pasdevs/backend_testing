@@ -457,6 +457,36 @@ app.patch('/updateStatus/:id', (req, res) => {
   }
 });
 
+// Endpoint DELETE untuk menghapus data berdasarkan ID
+app.delete('/deleteData/:id', (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Query untuk menghapus data berdasarkan ID
+    const deleteQuery = 'DELETE FROM tb_master_nomor_surat WHERE ID = ?';
+
+    // Parameter untuk query
+    const deleteValues = [id];
+
+    // Menjalankan query untuk menghapus data di database
+    connection.query(deleteQuery, deleteValues, (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Gagal menghapus data di database' });
+      } else {
+        if (results.affectedRows > 0) {
+          res.json({ success: true, message: 'Data berhasil dihapus' });
+        } else {
+          res.status(404).json({ success: false, error: 'Data tidak ditemukan' });
+        }
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Gagal menghapus data' });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server berjalan di http://localhost:${port}`);
