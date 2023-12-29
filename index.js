@@ -359,7 +359,7 @@ app.put('/updateData/:id', upload.single('file'), (req, res) => {
 
   try {
     const { NOMOR_SURAT, YANG_MENANDATANGANI, YANG_MENANDATANGANI_KODE, KODE_SURAT, BULAN, BULAN_ROMAWI, TAHUN, PERIHAL, UNIT_KERJA, STATUS, NOMOR_SURAT_LENGKAP, URL_DRAFT_SURAT, TANGGAL_PENGAJUAN, YANG_MEMBUBUHKAN_TTD, AUTHOR, NOMOR_WA_AUTHOR, EMAIL_AUTHOR, KETERANGAN, SERAHKAN_DOKUMEN } = req.body;
-    const fileUrl = req.file ? req.file.originalname : null;
+    const fileUrl = req.file ? req.file.originalname : URL_DRAFT_SURAT;
     // Query untuk memperbarui data dalam tabel
     const query = `
       UPDATE tb_master_nomor_surat
